@@ -1,5 +1,5 @@
 from crawl import crawl_website_bfs
-from helper import visualize_and_save_topology, save_graph_structure
+from helper import visualize_and_save_topology, save_graph_structure, save_as_json_to_data_folder
 
 import os
 import json
@@ -8,10 +8,11 @@ import json
 # Main function
 def main():
     start_url = 'https://cs.brown.edu/'  # Replace with your desired start URL
-    max_depth = 3  # Maximum depth to crawl
+    max_depth = 2  # Maximum depth to crawl
     keyword = 'cs.brown.edu'  # Keyword to filter URLs
     filename_graphml = f'cs_brown_edu_depth_{max_depth}_topology.graphml'
     filename_image = f'cs_brown_edu_depth_{max_depth}_topology.png'
+    
     # Crawl the website
     print(f"Crawling website: {start_url} ...")
     website_graph, links_by_depth = crawl_website_bfs(start_url, max_depth, keyword)
@@ -30,16 +31,13 @@ def main():
     data_directory = os.path.join(parent_directory, 'data')
 
     # Save the graph structure
-    save_graph_structure(website_graph, data_directory, filename_graphml)
+    # save_graph_structure(website_graph, data_directory, filename_graphml)
 
     # Visualize and save the graph visualization
-    visualize_and_save_topology(website_graph, data_directory, filename_image)
+    # visualize_and_save_topology(website_graph, data_directory, filename_image)
 
     # Save the dictionary structure
-    json_file_path = os.path.join(data_directory, f'links_by_depth_{max_depth}.json')
-    with open(json_file_path, 'w') as file:
-        json.dump(links_by_depth, file)
-        
+    save_as_json_to_data_folder(links_by_depth, f'links_by_depth_{max_depth}.json')  
         
 if __name__ == "__main__":
     main()

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import os
+import json
 
 
 # Function to save the graph structure
@@ -22,3 +23,17 @@ def visualize_and_save_topology(graph, directory, filename):
     plt.title("Website Topology")
     plt.savefig(filepath)  # Save the visualization as an image file
     plt.show()
+
+def save_as_json_to_data_folder(content, filename):
+
+    data_directory = os.path.join(os.path.dirname(__file__), os.pardir, 'data')
+    os.makedirs(data_directory, exist_ok=True)
+    json_file_path = os.path.join(data_directory, filename)
+
+    if isinstance(content, dict):
+        # Convert sets to lists
+        content = {key: list(value) for key, value in content.items() if isinstance(value, set)}
+
+    with open(json_file_path, 'w') as file:
+        json.dump(content, file)
+    print(f"saved {filename} to ./data ")
