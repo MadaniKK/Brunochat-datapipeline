@@ -8,7 +8,7 @@ import json
 # Main function
 def main():
     start_url = 'https://cs.brown.edu/'  # Replace with your desired start URL
-    max_depth = 2  # Maximum depth to crawl
+    max_depth = 1  # Maximum depth to crawl
     keyword = 'cs.brown.edu'  # Keyword to filter URLs
     filename_graphml = f'cs_brown_edu_depth_{max_depth}_topology.graphml'
     filename_image = f'cs_brown_edu_depth_{max_depth}_topology.png'

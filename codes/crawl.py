@@ -4,6 +4,7 @@ from bs4 import UnicodeDammit
 import networkx as nx
 import time
 import urllib.parse
+from collections import defaultdict
 
 
 REQUEST_TIMEOUT = 8
@@ -21,7 +22,7 @@ import urllib.parse  # Correct import statement
 def crawl_website_bfs(start_url, max_depth=3, keyword='cs.brown.edu'):
     visited = set()
     graph = nx.DiGraph()
-    links_by_depth = {}
+    links_by_depth = defaultdict(list)
     queue = deque([(start_url, 0)])  # Initialize queue with start URL and depth 0
 
     while queue:
@@ -40,12 +41,12 @@ def crawl_website_bfs(start_url, max_depth=3, keyword='cs.brown.edu'):
             
             if response.status_code == 200:
                 visited.add(url)
-                if len(visited) % 20 == 0:
-                    print(url)
+                # if len(visited) % 20 == 0:
+                #     print(url)
+                #     print(len(visited))
                 dammit = UnicodeDammit(response.content)
                 soup = BeautifulSoup(dammit.unicode_markup, 'html.parser')
                 links = soup.find_all('a', href=True)
-                unique_links = set()  # Create a set to store unique URLs at this depth level
                 for link in links:
                     href = link.get('href')
                     if href:
@@ -55,9 +56,11 @@ def crawl_website_bfs(start_url, max_depth=3, keyword='cs.brown.edu'):
                             graph.add_edge(url, full_url)
                             if current_depth + 1 <= max_depth:
                                 queue.append((full_url, current_depth + 1))
-                            unique_links.add(full_url)  # Add the full URL to the set
-                links_by_depth.setdefault(current_depth, set()).update(unique_links)  # Update the set in the dictionary
+                            links_by_depth[current_depth].append(full_url)
         except Exception as e:
             print(f"Failed to crawl {url}: {e}")
+
+    for depth, links_list in links_by_depth.items():
+        links_by_depth[depth] = list(set(links_list))
 
     return graph, links_by_depth
