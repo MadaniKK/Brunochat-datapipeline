@@ -41,9 +41,9 @@ def crawl_website_bfs(start_url, max_depth=3, keyword='cs.brown.edu'):
             
             if response.status_code == 200:
                 visited.add(url)
-                # if len(visited) % 20 == 0:
-                #     print(url)
-                #     print(len(visited))
+                if len(visited) % 200 == 0:
+                    print(url)
+                    print(len(visited))
                 dammit = UnicodeDammit(response.content)
                 soup = BeautifulSoup(dammit.unicode_markup, 'html.parser')
                 links = soup.find_all('a', href=True)
