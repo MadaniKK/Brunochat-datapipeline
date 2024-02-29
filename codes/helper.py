@@ -30,9 +30,9 @@ def save_as_json_to_data_folder(content, filename):
     os.makedirs(data_directory, exist_ok=True)
     json_file_path = os.path.join(data_directory, filename)
 
-    if isinstance(content, dict):
-        # Convert sets to lists
-        content = {key: list(value) for key, value in content.items() if isinstance(value, set)}
+    # if isinstance(content, dict):
+    #     # Convert sets to lists
+    #     content = {key: list(value) for key, value in content.items() if isinstance(value, set)}
 
     with open(json_file_path, 'w') as file:
         json.dump(content, file)
