@@ -44,7 +44,7 @@ class BrownCrawlerSpider(scrapy.Spider):
             self.logger.info(f'Depth {depth}: {len(urls)} URLs')
 
         depth_limit = self.settings.get('DEPTH_LIMIT', 0)
-        file_name = f'../data/new_links_by_death_{depth_limit}.json'
+        file_name = f'../data/new_links_by_depth_{depth_limit}.json'
        
 
         with open(file_name, 'w') as f:
