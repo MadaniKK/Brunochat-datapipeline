@@ -1,37 +1,54 @@
 import scrapy
 import json
+from urllib.parse import urljoin, urlparse
 
 class BrownCrawlerSpider(scrapy.Spider):
     name = 'browncrawler'
     allowed_domains = ['cs.brown.edu']
     start_urls = ['http://cs.brown.edu/']
+    custom_settings = {
+        'DEPTH_LIMIT': 10,
+    }
 
     def __init__(self, *args, **kwargs):
         super(BrownCrawlerSpider, self).__init__(*args, **kwargs)
-        self.results = {}
+        # Initialize to store URLs by depth
+        self.links_by_depth = {}
+
 
     def parse(self, response):
-        level = response.meta.get('level', 0)
-        url = response.url
-
         # Extract all links from the current page
         links = response.css('a::attr(href)').getall()
 
-        # Filter out external links and keep only links under cs.brown.edu domain
-        internal_links = [link for link in links if 'cs.brown.edu' in link]
+        # Resolve relative URLs to absolute URLs and filter by domain
+        absolute_links = {urljoin(response.url, link) for link in links if 'cs.brown.edu' in urljoin(response.url, link)}
 
-        # Count the number of URLs at this level
-        url_count = len(internal_links)
-        print(f"Level {level} - URLs at {response.url}: {url_count}")
+        # Current depth
+        current_depth = response.meta.get('depth', 0)
 
-        # Save the results
-        self.results[url] = url_count
+        # Initialize the set for this depth if not already
+        if current_depth not in self.links_by_depth:
+            self.links_by_depth[current_depth] = set()
 
-        # Follow internal links recursively
-        for link in internal_links:
-            yield scrapy.Request(url=link, callback=self.parse, meta={'level': level + 1})
+        # Add the links to the set for the current depth
+        self.links_by_depth[current_depth].update(absolute_links)
+
+        # Follow internal links
+        for link in absolute_links:
+            yield scrapy.Request(url=link, callback=self.parse)
+
 
     def closed(self, reason):
-        # Dump the results into a JSON file
-        with open('crawl_results.json', 'w') as f:
-            json.dump(self.results, f)
+         # Log the counts
+        for depth, urls in self.links_by_depth.items():
+            self.logger.info(f'Depth {depth}: {len(urls)} URLs')
+
+        depth_limit = self.settings.get('DEPTH_LIMIT', 0)
+        file_name = f'../data/new_links_by_death_{depth_limit}.json'
+       
+
+        with open(file_name, 'w') as f:
+            # Convert sets to lists for JSON serialization
+            json.dump({depth: list(urls) for depth, urls in self.links_by_depth.items()}, f)
+
+ 
