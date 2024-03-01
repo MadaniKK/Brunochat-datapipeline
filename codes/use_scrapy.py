@@ -7,7 +7,7 @@ class BrownCrawlerSpider(scrapy.Spider):
     allowed_domains = ['cs.brown.edu']
     start_urls = ['http://cs.brown.edu/']
     custom_settings = {
-        'DEPTH_LIMIT': 10,
+        'DEPTH_LIMIT': 20,
     }
 
     def __init__(self, *args, **kwargs):

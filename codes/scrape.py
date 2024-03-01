@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-with open('./data/links_by_depth_0.json', 'r') as file:
+with open('./data/new_links_by_death_10.json', 'r') as file:
     links_by_depth_3 = json.load(file)
 # Initialize an empty list to store all links
 all_links = []
