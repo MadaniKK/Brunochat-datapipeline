@@ -33,6 +33,7 @@ def save_as_json_to_data_folder(content, filename):
     # if isinstance(content, dict):
     #     # Convert sets to lists
     #     content = {key: list(value) for key, value in content.items() if isinstance(value, set)}
+    content = {key: list(value) for key, value in content.items()}
 
     with open(json_file_path, 'w') as file:
         json.dump(content, file)

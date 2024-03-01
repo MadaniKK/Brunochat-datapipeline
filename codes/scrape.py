@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # Load the GraphML file into a NetworkX graph variable
-with open('./data/links_by_depth_3.json', 'r') as file:
+with open('./data/links_by_depth_2.json', 'r') as file:
     links_by_depth_3 = json.load(file)
 # Initialize an empty list to store all links
 all_links = []
@@ -14,10 +14,13 @@ for depth, links in links_by_depth_3.items():
     all_links.extend(links)
 
 # Remove duplicates by converting the list to a set and back to a list
+print(len(all_links))
 all_links = list(set(all_links))
 
+print(len(all_links))
+
 # If you want to save the unique links back to a JSON file
-with open('./data/unique_links_3.json', 'w') as file:
+with open('./data/unique_links_2.json', 'w') as file:
     json.dump(all_links, file, indent=4)
 
 # # Dictionary to store scraped text content (URL as key, text content as value)

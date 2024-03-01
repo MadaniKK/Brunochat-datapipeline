@@ -8,7 +8,7 @@ import json
 # Main function
 def main():
     start_url = 'https://cs.brown.edu/'  # Replace with your desired start URL
-    max_depth = 100  # Maximum depth to crawl
+    max_depth = 1  # Maximum depth to crawl
     keyword = 'cs.brown.edu'  # Keyword to filter URLs
     filename_graphml = f'cs_brown_edu_depth_{max_depth}_topology.graphml'
     filename_image = f'cs_brown_edu_depth_{max_depth}_topology.png'
@@ -19,9 +19,22 @@ def main():
     print("Crawling complete.")
 
     # Print the number of links at each depth level
+    # Initialize a set to store all unique links encountered so far
+    all_unique_links = set()
+
+    # Print the number of unique links at each depth level
     for depth, links in links_by_depth.items():
-        print(f"Depth {depth}: {len(links)} links")
-    
+        # Convert the list of links to a set to remove duplicates
+        unique_links = set(links)
+        # Remove links that have already been encountered in previous levels
+        unique_links -= all_unique_links
+        # Update the set of all unique links with the new links from this level
+        all_unique_links.update(unique_links)
+        print(f"Depth {depth}: {len(unique_links)} unique links")
+
+    # Print the total number of unique links across all depth levels
+    print(f"Total unique links: {len(all_unique_links)}")
+
     current_directory = os.path.dirname(__file__)
 
     # Path to the parent directory (which contains both codes and data directories)
