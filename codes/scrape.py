@@ -1,67 +1,45 @@
+import scrapy
 import json
-import requests
-from bs4 import BeautifulSoup
+import scrapy
+import json
 
-
-with open('./data/new_links_by_depth_0.json', 'r') as file:
-    links_by_depth = json.load(file)
-# Initialize an empty list to store all links
-all_links = []
-
-# Iterate through each depth level in the dictionary
-for depth, links in links_by_depth.items():
-    # Extend the list of links at each depth level
-    all_links.extend(links)
-
-# Remove duplicates by converting the list to a set and back to a list
-print(len(all_links))
-all_links = list(set(all_links))
-
-print(len(all_links))
+class MySpider(scrapy.Spider):
+    name = 'myspider'
     
-# all_unique_links = set()
+    # List of URLs to scrape
+    start_urls = [
+        'https://cs.brown.edu/',
+        "https://cs.brown.edu/people/grad/myuhan/", 
+        "https://blog.cs.brown.edu/2023/12/18/research-associate-tom-sgouros-and-brown-cs-students-use-sound-and-ai-make-nasa-imagery-accessible/", 
+        "http://wellness.advocates@lists.cs.brown.edu", 
+        "https://cs.brown.edu/people/ugrad/stang52/", 
+        "https://cs.brown.edu/people/grad/ztang47/", 
+        "https://cs.brown.edu/giving", 
+        "https://cs.brown.edu/about/system/accounts/", 
+        "https://cs.brown.edu/courses/info/data2040/"
+        # Add more URLs as needed
+    ]
 
-# for depth, links in links_by_depth.items():
-#     unique_links = set(links) - all_unique_links
-#     all_unique_links.update(unique_links)
-#     print(f"Depth {depth}: {len(unique_links)} unique links")
+    def __init__(self, *args, **kwargs):
+        super(MySpider, self).__init__(*args, **kwargs)
+        self.scraped_data = {}  # Initialize an empty dictionary to store scraped data
 
-# print(f"Total unique links: {len(all_unique_links)}")
+    def parse(self, response):
+        # Extract text content from the response
+        text_content = response.xpath('//p//text() | //h1//text() | //h2//text() | //h3//text() | //h4//text() | //div//text()').getall()
+        
+        # Concatenate the text content into a single string
+      
+        # Clean up the text content by removing unwanted whitespace characters and extra spaces
+         # Clean up the text content by removing unwanted whitespace characters and extra spaces
+        cleaned_text_content = ' '.join(text.strip() for text in text_content if text.strip())
+        
+        cleaned_text_content = cleaned_text_content.strip().replace('\n', '').replace('\r', '').replace('\t', '').replace('\u00a0', ' ')
+        
+        # Store the cleaned text content in the dictionary with the URL as the key
+        self.scraped_data[response.url] = cleaned_text_content
 
-
-
-
-
-# If you want to save the unique links back to a JSON file
-# with open('./data/unique_links_3.json', 'w') as file:
-#     json.dump(all_links, file, indent=4)
-
-# # Dictionary to store scraped text content (URL as key, text content as value)
-# scraped_data = {}
-
-# def scrape_text_from_website(url):
-#     try:
-#         response = requests.get(url)
-#         if response.status_code == 200:
-#             soup = BeautifulSoup(response.content, 'html.parser')
-#             # Extract text content from the webpage
-#             text_content = soup.get_text()
-#             return text_content
-#         else:
-#             print(f"Failed to fetch content from {url}: HTTP status code {response.status_code}")
-#     except Exception as e:
-#         print(f"Failed to scrape content from {url}: {e}")
-#     return None
-
-# # Scrape text content from each website
-# for url in depth_1_links[:5]:
-#     text_content = scrape_text_from_website(url)
-#     if text_content:
-#         scraped_data[url] = text_content
-#         print(f"Scraped text content from {url}")
-
-# # Print the scraped data (for demonstration)
-# for url, content in scraped_data.items():
-#     print(f"URL: {url}")
-#     print(content[:100])
-#     print("-" * 50)
+    def closed(self, reason):
+        # Save the scraped data into a JSON file
+        with open('test_scraped_data.json', 'w') as f:
+            json.dump(self.scraped_data, f)
