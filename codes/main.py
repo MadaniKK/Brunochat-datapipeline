@@ -1,5 +1,9 @@
 from crawl import crawl_website_bfs_parallel
-from helper import visualize_and_save_topology, save_graph_structure, save_as_json_to_data_folder
+from helper import (
+    visualize_and_save_topology,
+    save_graph_structure,
+    save_as_json_to_data_folder,
+)
 
 import os
 import json
@@ -7,12 +11,12 @@ import json
 
 # Main function
 def main():
-    start_url = 'https://cs.brown.edu/'  # Replace with your desired start URL
+    start_url = "https://cs.brown.edu/"  # Replace with your desired start URL
     max_depth = 0  # Maximum depth to crawl
-    keyword = 'cs.brown.edu'  # Keyword to filter URLs
-    filename_graphml = f'cs_brown_edu_depth_{max_depth}_topology.graphml'
-    filename_image = f'cs_brown_edu_depth_{max_depth}_topology.png'
-    
+    keyword = "cs.brown.edu"  # Keyword to filter URLs
+    filename_graphml = f"cs_brown_edu_depth_{max_depth}_topology.graphml"
+    filename_image = f"cs_brown_edu_depth_{max_depth}_topology.png"
+
     # Crawl the website
     print(f"Crawling website: {start_url} ...")
     links_by_depth = crawl_website_bfs_parallel(start_url, max_depth, keyword)
@@ -42,7 +46,8 @@ def main():
     # visualize_and_save_topology(website_graph, data_directory, filename_image)
 
     # Save the dictionary structure
-    save_as_json_to_data_folder(links_by_depth, f'links_by_depth_{max_depth}.json')  
-        
+    save_as_json_to_data_folder(links_by_depth, f"links_by_depth_{max_depth}.json")
+
+
 if __name__ == "__main__":
     main()
