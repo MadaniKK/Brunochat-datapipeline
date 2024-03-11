@@ -11,10 +11,10 @@ class MySpider(scrapy.Spider):
     name = "myspider"
 
     # List of URLs to scrape
-    start_urls = list_1000
-    # start_urls = (
-    #     "https://cs.brown.edu/courses/cs173/2012/Videos/2012-09-26/2012-09-26.high.m4v"
-    # )
+    # start_urls = list_1000
+    start_urls = (
+        "https://pyret.cs.brown.edu/assignment/1-BzXD0LYkK7neGbwxcO8XXVJ1KDm48TO"
+    )
 
     def __init__(self, *args, **kwargs):
         super(MySpider, self).__init__(*args, **kwargs)
@@ -47,6 +47,8 @@ class MySpider(scrapy.Spider):
 
         # Clean up the text content by removing unwanted whitespace characters and extra spaces
         # Clean up the text content by removing unwanted whitespace characters and extra spaces
+        if not text_content:
+            return
         cleaned_text_content = " ".join(
             text.strip() for text in text_content if text.strip()
         )
@@ -57,18 +59,18 @@ class MySpider(scrapy.Spider):
             .replace("\r", "")
             .replace("\t", "")
             .replace("\u00a0", " ")
-            # .replace("                  ", " ")
-            # .replace("                ", " ")
-            # .replace("           ", " ")
         )
         cleaned_text_content = " ".join(cleaned_text_content.split())
-
+        if len(cleaned_text_content) == 0:
+            return
         # Store the cleaned text content in the dictionary with the URL as the key
         self.scraped_data[response.url] = cleaned_text_content
         self.scraped_text += cleaned_text_content
 
     def closed(self, reason):
         # Save the scraped data into a JSON file
+        if len(self.scraped_data) == 0:
+            return
         with open("scraped_data_1000.json", "w") as f:
             json.dump(self.scraped_data, f)
 
