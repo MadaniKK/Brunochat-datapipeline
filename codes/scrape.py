@@ -4,6 +4,7 @@ import scrapy
 import json
 import scrapy
 from email.utils import parsedate_to_datetime
+from count_token import num_tokens_from_string
 
 
 with open("../data/filtered_links_deepest.json", "r") as file:
@@ -50,31 +51,32 @@ class MySpider(scrapy.Spider):
 
         # headers
         headers = response.xpath("//h1/text() | //h2/text()").getall()
+        cleaned_headers = []
         for header in headers:
-            header = " ".join(word.strip() for word in header if word.strip())
-            header.strip().replace("\n", "").replace("\r", "").replace(
-                "\t", ""
-            ).replace("\u00a0", " ")
-        metadata["headings"] = headers
+            cleaned_header = header.strip()
+            # Replace unwanted characters
+            cleaned_header = (
+                cleaned_header.replace("\n", "")
+                .replace("\r", "")
+                .replace("\t", "")
+                .replace("\u00a0", " ")
+            )
+            # Add the cleaned header to the list
+            cleaned_headers.append(cleaned_header)
+        metadata["headings"] = cleaned_headers
+
         text_content = response.xpath(
             """
-                        //body/*[not(
-                            self::div[@id="header"] or 
-                            self::div[@id="footer"] or 
-                            self::ul[@id="navbar2"] or 
-                            self::ul[@id="navbar3"]
-                        )   and not(
-                            ancestor::div[@id="header"] or 
-                            ancestor::div[@id="footer"] or 
-                            ancestor::ul[@id="navbar2"] or 
-                            ancestor::ul[@id="navbar3"]
-                        )]//text()[normalize-space()]
-                    """
+            //body//*[not(self::script or self::style or self::link or self::meta
+                        or self::div[@id="header"] or self::div[@id="footer"]
+                        or self::ul[@id="navbar2"] or self::ul[@id="navbar3"])
+                and not(ancestor::div[@id="header"] or ancestor::div[@id="footer"]
+                        or ancestor::ul[@id="navbar2"] or ancestor::ul[@id="navbar3"]
+                        or ancestor::style)]
+            /text()[normalize-space()]
+            """
         ).getall()
 
-        # Concatenate the text content into a single string
-
-        # Clean up the text content by removing unwanted whitespace characters and extra spaces
         # Clean up the text content by removing unwanted whitespace characters and extra spaces
         if not text_content:
             return
@@ -93,11 +95,17 @@ class MySpider(scrapy.Spider):
 
         # Use re.sub() to replace unwanted characters with an empty string
         cleaned_text = re.sub(pattern, "", cleaned_text_content)
+        split_text = cleaned_text.split()
+        metadata["word-count"] = len(split_text)
+        cleaned_text = " ".join(split_text)
+        metadata["token-count-estimate"] = num_tokens_from_string(
+            cleaned_text, "cl100k_base"
+        )
 
-        if len(cleaned_text_content) == 0:
+        if len(cleaned_text) == 0:
             return
         # Store the cleaned text content in the dictionary with the URL as the key
-        url_dict["text_content"] = cleaned_text_content
+        url_dict["text-content"] = cleaned_text
         url_dict["metadata"] = metadata
         self.scraped_data[response.url] = url_dict
         self.scraped_text += cleaned_text_content
