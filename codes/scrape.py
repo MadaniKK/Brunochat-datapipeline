@@ -9,7 +9,7 @@ from count_token import num_tokens_from_string
 
 with open("../data/filtered_links_deepest.json", "r") as file:
     links_by_depth = json.load(file)
-    list_1000 = links_by_depth[:100]
+    list_1000 = links_by_depth[:1000]
 
 
 class MySpider(scrapy.Spider):
@@ -40,27 +40,27 @@ class MySpider(scrapy.Spider):
             last_modified_datetime = last_modified_datetime.replace(tzinfo=timezone.utc)
             last_modified_iso = last_modified_datetime.isoformat(timespec="seconds")
 
-            metadata["last-modified"] = last_modified_iso
+            metadata["last_modified"] = last_modified_iso
         else:
-            metadata["last-modified"] = "N/A"
+            metadata["last_modified"] = "N/A"
 
-        # For Scraped-At (also assuming UTC for consistency)
+        # For scraped_at (also assuming UTC for consistency)
         scraped_at_datetime = datetime.now(timezone.utc)
         scraped_at_iso = scraped_at_datetime.isoformat(timespec="seconds")
-        metadata["scraped-at"] = scraped_at_iso
+        metadata["scraped_at"] = scraped_at_iso
 
         # headers
         headers = response.xpath("//h1/text() | //h2/text()").getall()
         cleaned_headers = []
         for header in headers:
-            cleaned_header = header.strip()
             # Replace unwanted characters
             cleaned_header = (
-                cleaned_header.replace("\n", "")
+                header.replace("\n", "")
                 .replace("\r", "")
                 .replace("\t", "")
-                .replace("\u00a0", " ")
+                .replace("\u00a0", "")
             )
+            cleaned_header = cleaned_header.strip()
             # Add the cleaned header to the list
             cleaned_headers.append(cleaned_header)
         metadata["headings"] = cleaned_headers
@@ -96,16 +96,16 @@ class MySpider(scrapy.Spider):
         # Use re.sub() to replace unwanted characters with an empty string
         cleaned_text = re.sub(pattern, "", cleaned_text_content)
         split_text = cleaned_text.split()
-        metadata["word-count"] = len(split_text)
+        metadata["word_count"] = len(split_text)
         cleaned_text = " ".join(split_text)
-        metadata["token-count-estimate"] = num_tokens_from_string(
+        metadata["token_count_estimate"] = num_tokens_from_string(
             cleaned_text, "cl100k_base"
         )
 
         if len(cleaned_text) == 0:
             return
         # Store the cleaned text content in the dictionary with the URL as the key
-        url_dict["text-content"] = cleaned_text
+        url_dict["text_content"] = cleaned_text
         url_dict["metadata"] = metadata
         self.scraped_data[response.url] = url_dict
         self.scraped_text += cleaned_text_content
@@ -114,9 +114,9 @@ class MySpider(scrapy.Spider):
         # Save the scraped data into a JSON file
         if len(self.scraped_data) == 0:
             return
-        with open("../data/scraped_data_100.json", "w") as f:
+        with open("../data/scraped_data_1000_1.json", "w") as f:
             json.dump(self.scraped_data, f)
 
-        with open("../data/data_text_100.txt", "w") as file:
+        with open("../data/data_text_1000_1.txt", "w") as file:
             # Write the string to the file
             file.write(self.scraped_text)
