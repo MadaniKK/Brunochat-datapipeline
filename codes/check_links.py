@@ -100,7 +100,7 @@ unwanted_substrings = [
     "https://cs.brown.edu/video/",
     "share=",
     "https://www.vrwiki.cs.brown.edu/vr-visualization-software/visualization-tutorials/paraview",
-    "https://www.google.com/",
+    "google.com/",
     "https://twitter.com/",
     "http://www.facebook.com/",
     ".doc",

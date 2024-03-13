@@ -12,4 +12,7 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
     return num_tokens
 
 
-num_tokens_from_string(text_string, "cl100k_base")
+num_tokens_from_string(
+    "in \Warehouses",
+    "cl100k_base",
+)
