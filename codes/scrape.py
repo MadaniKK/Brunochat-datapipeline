@@ -9,7 +9,7 @@ from count_token import num_tokens_from_string
 
 with open("../data/filtered_links_deepest.json", "r") as file:
     links_by_depth = json.load(file)
-    list_1000 = links_by_depth[:1000]
+    list_1000 = links_by_depth[10:12]
 
 
 class MySpider(scrapy.Spider):
@@ -114,9 +114,9 @@ class MySpider(scrapy.Spider):
         # Save the scraped data into a JSON file
         if len(self.scraped_data) == 0:
             return
-        with open("../data/scraped_data_1000_1.json", "w") as f:
+        with open("../data/scraped_data_test.json", "w") as f:
             json.dump(self.scraped_data, f)
 
-        with open("../data/data_text_1000_1.txt", "w") as file:
-            # Write the string to the file
-            file.write(self.scraped_text)
+        # with open("../data/data_text_1000_1.txt", "w") as file:
+        #     # Write the string to the file
+        #     file.write(self.scraped_text)

@@ -27,9 +27,14 @@ model = "text-embedding-3-small"
 # Define your class name representing your data
 class_name = "CSWebsiteContent"
 
-link_data_collections = load_data_from_json("data/scraped_data_1000_1.json")
+link_data_collections = load_data_from_json("data/scraped_data_test.json")
 
 skipped_url = []
+
+# load by batch
+batch_size = 100
+batch_objects = []
+
 for key, url_dic in link_data_collections.items():
     url = key
     text_content = url_dic["text_content"]
@@ -47,10 +52,50 @@ for key, url_dic in link_data_collections.items():
     metadata["embeddings"] = embedding
     metadata["text_content"] = text_content
     object_to_add = {"class": class_name, "properties": metadata}
-    payload_json = json.dumps(object_to_add)
-    # print(payload_json)
+    batch_objects.append(object_to_add)
+
+    if len(batch_objects) >= batch_size:
+        # Send batch request
+        payload_json = json.dumps({"objects": batch_objects})
+        response = requests.post(
+            f"{weaviate_url}/v1/batch/objects", headers=headers, data=payload_json
+        )
+        print(response.text)
+
+        # Reset batch_objects list
+        batch_objects = []
+
+# Add remaining objects
+if batch_objects:
+    payload_json = json.dumps({"objects": batch_objects})
     response = requests.post(
-        f"{weaviate_url}/v1/objects", headers=headers, data=payload_json
+        f"{weaviate_url}/v1/batch/objects", headers=headers, data=payload_json
     )
     print(response.text)
-    break
+
+# load object one by one
+
+# for key, url_dic in link_data_collections.items():
+#     url = key
+#     text_content = url_dic["text_content"]
+#     metadata = url_dic["metadata"]
+
+#     if int(metadata["token_count_estimate"]) > 8050:
+#         skipped_url.append(url)
+#         continue
+
+#     metadata["url"] = url
+#     embedding = turn_text_into_embeddings(model, text_content)
+#     if embedding is None:
+#         skipped_url.append(url)
+#         continue
+#     metadata["embeddings"] = embedding
+#     metadata["text_content"] = text_content
+#     object_to_add = {"class": class_name, "properties": metadata}
+#     payload_json = json.dumps(object_to_add)
+#     # print(payload_json)
+#     response = requests.post(
+#         f"{weaviate_url}/v1/objects", headers=headers, data=payload_json
+#     )
+#     print(response.text)
+#     break
