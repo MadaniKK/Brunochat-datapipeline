@@ -73,6 +73,10 @@ if batch_objects:
     )
     print(response.text)
 
+if len(skipped_url) != 0:
+    with open("../data/skipped_url.json", "w") as f:
+        json.dump(skipped_url, f)
+
 # load object one by one
 
 # for key, url_dic in link_data_collections.items():
