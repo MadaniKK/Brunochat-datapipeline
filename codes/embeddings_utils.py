@@ -12,7 +12,7 @@ endpoint_url = "https://api.openai.com/v1/embeddings"
 
 # Define the headers with your API key and content type
 headers = {
-    "Authorization": f"Bearer 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",
+    "Authorization": f"Bearer {api_key}",
     "Content-Type": "application/json",
 }
 
