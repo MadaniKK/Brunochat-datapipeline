@@ -11,7 +11,7 @@
 
 ## Introduction
 
-BrunoChat Data Pipeline is responsible for crawling and scraping web content from the Computer Science Department at Brown University. It is an essential component of the BrunoChat project, providing the necessary data for training and fine-tuning the chatbot's language models.
+BrunoChat is a chatbot designed to serve as an innovative conversational knowledge interface for the Computer Science Department. BrunoChat Data Pipeline is responsible for crawling and scraping web content from the Computer Science Department at Brown University. It is an essential component of the BrunoChat project, providing the necessary data for training and fine-tuning the chatbot's language models.
 
 ## Motivation
 
