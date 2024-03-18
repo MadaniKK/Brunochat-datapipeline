@@ -45,6 +45,3 @@ We welcome contributions from the community! If you'd like to contribute to the 
 - Test your changes thoroughly
 - Submit a pull request with a clear description of your changes
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
