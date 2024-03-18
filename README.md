@@ -24,7 +24,7 @@ The data pipeline consists of web crawling and web scraping components. The web 
 ## Getting Started
 1. Clone the repository: `git clone git@github.com:MadaniKK/2270-crawler-test.git`
 2. Install dependencies: `pip install -r requirements.txt`
-3. `cd codes` goes to the codes directory
+3. `cd codes` to go to the codes directory
 4. `scrapy runspider use_scrapy.py` will run Scrapy to crawl all the URLs under the 'cs.brown.edu' domain.
 5. `scrapy runspider scrape.py` will run Scrapy to scrape all the text content from the provided URLs.
 6. `check_links.py` is for filtering out the undesired URLs and preprocessing the data into the desired format. 
