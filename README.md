@@ -32,7 +32,8 @@ The data pipeline consists of web crawling and web scraping components. The web 
 5. `scrapy runspider scrape.py` will run Scrapy to scrape all the text content from the provided URLs.
 6. `check_links.py` is for filtering out the undesired URLs and preprocessing the data into the desired format. 
 7.  `weaviate_setup.py` is for the initial setup for the Weaviate vector database and defining classes.
-8.  `data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in Weaviate.
+8.  `qdrant_setup.py` is for the initial setup for the Weaviate vector database and defining classes.
+9.  `data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in Weaviate.
 
 
 ## Usage
