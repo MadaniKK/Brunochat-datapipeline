@@ -1,5 +1,8 @@
 # BrunoChat Data Pipeline
 
+## BrunoChat Repository
+Refer to [BrunoChat](https://github.com/aetherrine/BrunoChat). 
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Motivation](#motivation)
