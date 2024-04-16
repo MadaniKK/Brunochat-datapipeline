@@ -3,26 +3,70 @@ import re
 import scrapy
 import json
 import scrapy
+import tiktoken
 from email.utils import parsedate_to_datetime
-from count_token import num_tokens_from_string
+from uuid import uuid4
+import os
+import requests
+from dotenv import load_dotenv
+from qdrant_client import QdrantClient, models
 
 
-with open("../data/filtered_links_deepest.json", "r") as file:
-    links_by_depth = json.load(file)
-    list_1000 = links_by_depth[10:12]
+load_dotenv()
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+client = QdrantClient(
+    "https://5ea28872-998e-4878-a3d7-9c2617741409.us-east4-0.gcp.cloud.qdrant.io",
+    api_key=QDRANT_API_KEY,
+)
+
+# Define your collection name
+collection_name = "CSWebsiteContent"
+
+
+def num_tokens_from_string(string: str, encoding_name: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+
+# Access environment variables
+api_key = os.getenv("OPENAI_API_KEY")
+
+endpoint_url = "https://api.openai.com/v1/embeddings"
+
+# Define the headers with your API key and content type
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json",
+}
+
+
+def turn_text_into_embeddings(model, text):
+    payload = {"model": model, "input": text}
+    # Make the POST request to the OpenAI API
+    response = requests.post(endpoint_url, headers=headers, json=payload)
+    if response.status_code == 200:
+        # Extract the embeddings from the response
+        data = response.json().get("data", [])
+        embedding = [item["embedding"] for item in data if "embedding" in item][0]
+        # print("Embeddings:", embedding)
+        return embedding
+    else:
+        print("Failed to generate embeddings:", response.text)
+        return None
 
 
 class MySpider(scrapy.Spider):
-    name = "myspider"
+    name = "awsspider"
 
     # List of URLs to scrape
-    start_urls = list_1000
-    # start_urls = ["https://uxfactor.cs.brown.edu/clone_privacy_policy.html"]
+
+    start_urls = ["https://uxfactor.cs.brown.edu/clone_privacy_policy.html"]
 
     def __init__(self, *args, **kwargs):
         super(MySpider, self).__init__(*args, **kwargs)
         self.scraped_data = {}  # Initialize an empty dictionary to store scraped data
-        self.scraped_text = ""
 
     def parse(self, response):
         # Extract text content from the response
@@ -108,15 +152,47 @@ class MySpider(scrapy.Spider):
         metadata["url"] = response.url
         url_dict["text_content"] = cleaned_text
         url_dict["metadata"] = metadata
+        url_dict["uuid"] = str(uuid4())
         self.scraped_data[response.url] = url_dict
-        self.scraped_text += cleaned_text_content
 
     def closed(self, reason):
+        print("helloworld")
         # Save the scraped data into a JSON file
         if len(self.scraped_data) == 0:
             return
-        with open("../data/scraped_data_test.json", "w") as f:
-            json.dump(self.scraped_data, f)
+        points = []
+        skipped_url = []
+        for key, url_dic in self.scraped_data.items():
+            url = key
+            text_content = url_dic["text_content"]
+            metadata = url_dic["metadata"]
+
+            if int(metadata["token_count_estimate"]) > 8050:
+                skipped_url.append(url)
+                continue
+
+            embedding = turn_text_into_embeddings(
+                "text-embedding-3-small", text_content
+            )
+            if embedding is None:
+                skipped_url.append(url)
+                continue
+
+            metadata["url"] = url  # Including URL in the payload
+            metadata["text_content"] = (
+                text_content  # Including text content in the payload
+            )
+            uuid = url_dic["uuid"]
+            # Prepare the point to be inserted into Qdrant
+            point = models.PointStruct(
+                id=uuid,
+                payload=metadata,
+                vector=embedding,
+            )
+            points.append(point)
+        print(points)
+        client.upsert(collection_name=collection_name, points=points)
+        print(skipped_url)
 
         # with open("../data/data_text_1000_1.txt", "w") as file:
         #     # Write the string to the file
