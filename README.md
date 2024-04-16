@@ -33,7 +33,7 @@ The data pipeline consists of web crawling and web scraping components. The web 
 6. `check_links.py` is for filtering out the undesired URLs and preprocessing the data into the desired format. 
 7.  `weaviate_setup.py` is for the initial setup for the Weaviate vector database and defining classes.
 8.  `data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in Weaviate cloud database.
-9. `qdrant_setup.py` is for the initial setup and testing for the Qdrant vector database
+9. `qdrant_setup.py` is for the initial setup and testing for the Qdrant vector database.
 10. `qdrant_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in Qdrant cloud database.
 
 
