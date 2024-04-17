@@ -1,6 +1,6 @@
 import scrapy
 import json
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 
 class BrownCrawlerSpider(scrapy.Spider):
     name = 'browncrawler'
