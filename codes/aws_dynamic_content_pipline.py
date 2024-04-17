@@ -1,8 +1,6 @@
 from datetime import datetime, timezone
 import re
 import scrapy
-import json
-import scrapy
 import tiktoken
 from email.utils import parsedate_to_datetime
 from uuid import uuid4
@@ -13,7 +11,7 @@ from qdrant_client import QdrantClient, models
 
 
 load_dotenv()
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
+QDRANT_API_KEY = os.environ("QDRANT_API_KEY")
 client = QdrantClient(
     "https://5ea28872-998e-4878-a3d7-9c2617741409.us-east4-0.gcp.cloud.qdrant.io",
     api_key=QDRANT_API_KEY,
@@ -31,7 +29,7 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
 
 
 # Access environment variables
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.environ("OPENAI_API_KEY")
 
 endpoint_url = "https://api.openai.com/v1/embeddings"
 
@@ -62,7 +60,11 @@ class MySpider(scrapy.Spider):
 
     # List of URLs to scrape
 
-    start_urls = ["https://uxfactor.cs.brown.edu/clone_privacy_policy.html"]
+    start_urls = [
+        "https://cs.brown.edu/news/",
+        "https://cs.brown.edu/events/",
+        "https://events.brown.edu/all/groups/Computer%20Science",
+    ]
 
     def __init__(self, *args, **kwargs):
         super(MySpider, self).__init__(*args, **kwargs)
@@ -193,7 +195,3 @@ class MySpider(scrapy.Spider):
         print(points)
         client.upsert(collection_name=collection_name, points=points)
         print(skipped_url)
-
-        # with open("../data/data_text_1000_1.txt", "w") as file:
-        #     # Write the string to the file
-        #     file.write(self.scraped_text)

@@ -1,8 +1,6 @@
 import weaviate
 from dotenv import load_dotenv
 import os
-from embeddings_utils import turn_text_into_embeddings
-from helper import load_data_from_json
 
 # Load environment variables from .env file
 load_dotenv()

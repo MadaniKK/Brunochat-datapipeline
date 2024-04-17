@@ -4,7 +4,7 @@ import scrapy
 import json
 import scrapy
 from email.utils import parsedate_to_datetime
-from count_token import num_tokens_from_string
+from helper import num_tokens_from_string
 
 
 with open("../data/filtered_links_deepest.json", "r") as file:

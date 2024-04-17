@@ -7,7 +7,6 @@ load_dotenv()
 
 # Access environment variables
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-client = QdrantClient(url="http://localhost:6333")
 
 
 qdrant_client = QdrantClient(
