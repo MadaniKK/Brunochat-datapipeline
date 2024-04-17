@@ -51,13 +51,13 @@ echo QDRANT_WCS_URL={server_url}   >> .env
 ```shell
 scrapy runspider codes/use_scrapy.py`
 ```
-### 6. Run Scrapy to scrape all the text content from the provided URLs
-```shell
-`scrapy runspider codes/scrape.py`
-```
-### 7. Filter out the undesired URLs and preprocessing the data into the desired format
+### 6. Filter out the undesired URLs and preprocessing the data into the desired format
 ```shell
  python3 codes/check_links.py
+```
+### 7. Run Scrapy to scrape all the text content from the provided URLs
+```shell
+`scrapy runspider codes/scrape.py`
 ```
 ### 8. Setup and write to the Weaviate/Qdrant vector database.
 ```shell
