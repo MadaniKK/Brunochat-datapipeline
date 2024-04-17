@@ -31,10 +31,11 @@ The data pipeline consists of web crawling and web scraping components. The web 
 4. `scrapy runspider use_scrapy.py` will run Scrapy to crawl all the URLs under the 'cs.brown.edu' domain.
 5. `scrapy runspider scrape.py` will run Scrapy to scrape all the text content from the provided URLs.
 6. `check_links.py` is for filtering out the undesired URLs and preprocessing the data into the desired format. 
-7.  `weaviate_setup.py` is for the initial setup and testing for the Weaviate vector database.
-8.  `data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in Weaviate cloud database.
+7. `weaviate_setup.py` is for the initial setup and testing for the Weaviate vector database.
+8. `weaviate_data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in the Weaviate cloud database.
 9. `qdrant_setup.py` is for the initial setup and testing for the Qdrant vector database.
-10. `qdrant_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in Qdrant cloud database.
+10. `qdrant_data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in the Qdrant cloud database.
+11. `../dynamic_content_aws_docker.zip` handles the dynamic content daily updates. It contains the folder that could be built into a docker image to deploy on AWS Lambda
 
 
 ## Usage
