@@ -11,7 +11,7 @@ from qdrant_client import QdrantClient, models
 
 
 load_dotenv()
-QDRANT_API_KEY = os.environ("QDRANT_API_KEY")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 client = QdrantClient(
     "https://5ea28872-998e-4878-a3d7-9c2617741409.us-east4-0.gcp.cloud.qdrant.io",
     api_key=QDRANT_API_KEY,
@@ -29,7 +29,7 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
 
 
 # Access environment variables
-api_key = os.environ("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 
 endpoint_url = "https://api.openai.com/v1/embeddings"
 
@@ -63,7 +63,7 @@ class MySpider(scrapy.Spider):
     start_urls = [
         "https://cs.brown.edu/news/",
         "https://cs.brown.edu/events/",
-        "https://events.brown.edu/all/groups/Computer%20Science",
+        # "https://events.brown.edu/all/groups/Computer%20Science",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -164,6 +164,7 @@ class MySpider(scrapy.Spider):
             return
         points = []
         skipped_url = []
+
         for key, url_dic in self.scraped_data.items():
             url = key
             text_content = url_dic["text_content"]

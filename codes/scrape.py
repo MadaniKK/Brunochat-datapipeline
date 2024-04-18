@@ -16,8 +16,12 @@ class MySpider(scrapy.Spider):
     name = "myspider"
 
     # List of URLs to scrape
-    start_urls = list_1000
-    # start_urls = ["https://uxfactor.cs.brown.edu/clone_privacy_policy.html"]
+    # start_urls = list_1000
+    start_urls = [
+        "https://cs.brown.edu/news/",
+        "https://cs.brown.edu/events/",
+        "https://events.brown.edu/all/groups/Computer%20Science",
+    ]
 
     def __init__(self, *args, **kwargs):
         super(MySpider, self).__init__(*args, **kwargs)
@@ -25,10 +29,7 @@ class MySpider(scrapy.Spider):
         self.scraped_text = ""
 
     def parse(self, response):
-        # Extract text content from the response
-        # text_content = response.xpath('//p//text() | //h1//text() | //h2//text() | //h3//text() | //h4//text() | //div//text()').getall()
 
-        # header and footer divs excluded
         url_dict = {}
         metadata = {}
 
@@ -117,7 +118,3 @@ class MySpider(scrapy.Spider):
             return
         with open("../data/scraped_data_test.json", "w") as f:
             json.dump(self.scraped_data, f)
-
-        # with open("../data/data_text_1000_1.txt", "w") as file:
-        #     # Write the string to the file
-        #     file.write(self.scraped_text)

@@ -1,6 +1,7 @@
 import os
 from qdrant_client import QdrantClient
 from dotenv import load_dotenv
+import datetime
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,3 +17,12 @@ qdrant_client = QdrantClient(
 
 collections_info = qdrant_client.get_collections()
 print("Collections:", collections_info)
+
+# qdrant_client.create_payload_index(
+#     collection_name="CSWebsiteContent",
+#     field_name="last_modified",
+#     field_schema="datetime",
+# )
+
+today_date = datetime.datetime.now().date().isoformat()
+print(today_date)
