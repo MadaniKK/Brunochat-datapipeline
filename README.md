@@ -10,7 +10,6 @@ Refer to [BrunoChat](https://github.com/aetherrine/BrunoChat) for more informati
 4. [Getting Started](#getting-started)
 5. [Usage](#usage)
 6. [Contributing](#contributing)
-7. [License](#license)
 
 ## Introduction
 
@@ -22,20 +21,54 @@ The motivation behind the BrunoChat Data Pipeline is to collect accurate and up-
 
 ## Description
 
-The data pipeline consists of web crawling and web scraping components. The web crawling component navigates through the department's website, identifying relevant pages to scrape. The web scraping component extracts text content from these pages, which is then used to train and fine-tune the chatbot's language models.
+The data pipeline consists of web crawling, web scraping components, writing data to vector database, and automating dynamic content daily updates. 
+1. Web crawling component navigates through the department's website, identifying relevant pages to scrape.
+2. Web scraping component extracts text content from these pages, which is then used to train and fine-tune the chatbot's language models.
+3.[Weaviate](https://weaviate.io/) or [Qdrant](https://qdrant.tech/) databases can be used as the vector database.
+4. A script is deployed on `AWS Lambda` to daily scrape dynamic content and update the database
 
 ## Getting Started
-1. Clone the repository: `git clone git@github.com:MadaniKK/2270-crawler-test.git`
-2. Install dependencies: `pip install -r requirements.txt`
-3. `cd codes` to go to the codes directory
-4. `scrapy runspider use_scrapy.py` will run Scrapy to crawl all the URLs under the 'cs.brown.edu' domain.
-5. `scrapy runspider scrape.py` will run Scrapy to scrape all the text content from the provided URLs.
-6. `check_links.py` is for filtering out the undesired URLs and preprocessing the data into the desired format. 
-7. `weaviate_setup.py` is for the initial setup and testing for the Weaviate vector database.
-8. `weaviate_data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in the Weaviate cloud database.
-9. `qdrant_setup.py` is for the initial setup and testing for the Qdrant vector database.
-10. `qdrant_data_pipline.py` is for turning the webpage content into embeddings via OpenAI APIs and storing them in the Qdrant cloud database.
-11. `../dynamic_content_aws_docker.zip` handles the dynamic content daily updates. It contains the folder that could be built into a docker image to deploy on AWS Lambda
+### 1. Clone the repository
+```shell
+git clone git@github.com:MadaniKK/2270-crawler-test.git
+```
+### 2. Activate Virtual Environment
+```shell
+python -m venv brunochat-env
+source brunochat-env/bin/activate
+```
+### 3. Install dependencies: 
+```shell
+pip install -r requirements.txt
+```
+### 4. Prepare Credentials
+```shell
+echo OPENAI_API_KEY={openai_key}     >> .env
+echo QDRANT_API_KEY={weaviate_key} >> .env
+echo QDRANT_WCS_URL={server_url}   >> .env
+```
+### 5. Run Scrapy to crawl all the URLs under the 'cs.brown.edu' domain
+```shell
+scrapy runspider codes/use_scrapy.py`
+```
+### 6. Filter out the undesired URLs and preprocessing the data into the desired format
+```shell
+ python3 codes/check_links.py
+```
+### 7. Run Scrapy to scrape all the text content from the provided URLs
+```shell
+`scrapy runspider codes/scrape.py`
+```
+### 8. Setup and write to the Weaviate/Qdrant vector database.
+```shell
+python3 codes/weaviate_setup.py
+python3 codes/weaviate_data_pipline.py
+#or
+python3 codes/qdrant_setup.py
+python3 codes/qdrant_data_pipline.py
+```
+### 9. Docker Image for handling Dynamic content on AWS
+ `/dynamic_content_aws_docker.zip` handles the dynamic content daily updates. It contains the folder that could be built into a docker image to deploy on AWS Lambda
 
 
 ## Usage
