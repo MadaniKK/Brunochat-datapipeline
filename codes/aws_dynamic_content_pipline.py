@@ -8,51 +8,29 @@ import os
 import requests
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient, models
+from datetime import datetime, timezone
+from aws_utils import (
+    num_tokens_from_string,
+    handle_calendar_api_data,
+    turn_text_into_embeddings,
+)
 
 
 load_dotenv()
+
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 client = QdrantClient(
     "https://5ea28872-998e-4878-a3d7-9c2617741409.us-east4-0.gcp.cloud.qdrant.io",
     api_key=QDRANT_API_KEY,
 )
-
-# Define your collection name
 collection_name = "CSWebsiteContent"
-
-
-def num_tokens_from_string(string: str, encoding_name: str) -> int:
-    """Returns the number of tokens in a text string."""
-    encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
-
-# Access environment variables
-api_key = os.getenv("OPENAI_API_KEY")
-
+# OpenAI API
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 endpoint_url = "https://api.openai.com/v1/embeddings"
-
-# Define the headers with your API key and content type
-headers = {
-    "Authorization": f"Bearer {api_key}",
+openai_headers = {
+    "Authorization": f"Bearer {OPENAI_API_KEY}",
     "Content-Type": "application/json",
 }
-
-
-def turn_text_into_embeddings(model, text):
-    payload = {"model": model, "input": text}
-    # Make the POST request to the OpenAI API
-    response = requests.post(endpoint_url, headers=headers, json=payload)
-    if response.status_code == 200:
-        # Extract the embeddings from the response
-        data = response.json().get("data", [])
-        embedding = [item["embedding"] for item in data if "embedding" in item][0]
-        # print("Embeddings:", embedding)
-        return embedding
-    else:
-        print("Failed to generate embeddings:", response.text)
-        return None
 
 
 class MySpider(scrapy.Spider):
@@ -152,7 +130,7 @@ class MySpider(scrapy.Spider):
             return
         # Store the cleaned text content in the dictionary with the URL as the key
         metadata["url"] = response.url
-        url_dict["text_content"] = cleaned_text
+        metadata["text_content"] = cleaned_text
         url_dict["metadata"] = metadata
         url_dict["uuid"] = str(uuid4())
         self.scraped_data[response.url] = url_dict
@@ -164,10 +142,34 @@ class MySpider(scrapy.Spider):
             return
         points = []
         skipped_url = []
+        urls = [
+            "https://events.brown.edu/live/calendar/view/all/groups/Computer%20Science?user_tz=EST&template_vars=id,href,image_src,title,time,title_link,latitude,longitude,location,online_url,online_button_label,online_instructions,until,repeats,is_multi_day,is_first_multi_day,multi_day_span,tag_classes,category_classes,online_type,has_map,custom_ticket_required&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_locations%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22use_tag_classes%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22search_all_events_only%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22use_modular_templates%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22display_all_day_events_last%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22format_single_image%22%3E%0A%20%20%20%20%7Bimage%7D%0A%20%20%20%20%7B%3Cdiv%20class%3D%22lw_image_caption%22%3E%7Ccaption%7C%3C%2Fdiv%3E%7D%0A%20%20%20%20%7B%3Cdiv%20class%3D%22lw_image_credit%20test1%22%3E%7Ccredit%7C%3C%2Fdiv%3E%7D%0A%20%20%3C%2Farg%3E%3C%2Fwidget%3E"
+        ]
+        for url in urls:
+            # Headers to specify accepted content type
+            headers = {"Accept": "application/json"}
+
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                # Parse the JSON data from response
+                data = response.json()
+            else:
+                print("Failed to retrieve data")
+            text_content = handle_calendar_api_data(data)
+            url_dict = {}
+            metadata = {}
+            metadata["text_content"] = text_content
+            metadata["url"] = url
+            metadata["token_count_estimate"] = num_tokens_from_string(
+                text_content, "cl100k_base"
+            )
+            metadata["word_count"] = len(text_content.split())
+            url_dict["metadata"] = metadata
+            url_dict["uuid"] = str(uuid4())
+            self.scraped_data[url] = url_dict
 
         for key, url_dic in self.scraped_data.items():
             url = key
-            text_content = url_dic["text_content"]
             metadata = url_dic["metadata"]
 
             if int(metadata["token_count_estimate"]) > 8050:
@@ -175,16 +177,16 @@ class MySpider(scrapy.Spider):
                 continue
 
             embedding = turn_text_into_embeddings(
-                "text-embedding-3-small", text_content
+                "text-embedding-3-small",
+                text_content,
+                endpoint_url,
+                openai_headers=openai_headers,
             )
             if embedding is None:
                 skipped_url.append(url)
                 continue
 
             metadata["url"] = url  # Including URL in the payload
-            metadata["text_content"] = (
-                text_content  # Including text content in the payload
-            )
             uuid = url_dic["uuid"]
             # Prepare the point to be inserted into Qdrant
             point = models.PointStruct(
