@@ -159,6 +159,11 @@ class MySpider(scrapy.Spider):
             url_dict = {}
             metadata = {}
             metadata["text_content"] = text_content
+            if (
+                url
+                == "https://events.brown.edu/live/calendar/view/all/groups/Computer%20Science?user_tz=EST&template_vars=id,href,image_src,title,time,title_link,latitude,longitude,location,online_url,online_button_label,online_instructions,until,repeats,is_multi_day,is_first_multi_day,multi_day_span,tag_classes,category_classes,online_type,has_map,custom_ticket_required&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_locations%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22use_tag_classes%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22search_all_events_only%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22use_modular_templates%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22display_all_day_events_last%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22format_single_image%22%3E%0A%20%20%20%20%7Bimage%7D%0A%20%20%20%20%7B%3Cdiv%20class%3D%22lw_image_caption%22%3E%7Ccaption%7C%3C%2Fdiv%3E%7D%0A%20%20%20%20%7B%3Cdiv%20class%3D%22lw_image_credit%20test1%22%3E%7Ccredit%7C%3C%2Fdiv%3E%7D%0A%20%20%3C%2Farg%3E%3C%2Fwidget%3E"
+            ):
+                url = "https://events.brown.edu/all/groups/Computer%20Science"
             metadata["url"] = url
             metadata["token_count_estimate"] = num_tokens_from_string(
                 text_content, "cl100k_base"
