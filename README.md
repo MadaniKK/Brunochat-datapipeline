@@ -30,7 +30,7 @@ The data pipeline consists of web crawling, web scraping components, writing dat
 ## Getting Started
 ### 1. Clone the repository
 ```shell
-git clone git@github.com:MadaniKK/2270-crawler-test.git
+git clone git@github.com:MadaniKK/Brunochat-datapipeline.git
 ```
 ### 2. Activate Virtual Environment
 ```shell
