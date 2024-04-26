@@ -24,7 +24,7 @@ The motivation behind the BrunoChat Data Pipeline is to collect accurate and up-
 The data pipeline consists of web crawling, web scraping components, writing data to vector database, and automating dynamic content daily updates. 
 1. Web crawling component navigates through the department's website, identifying relevant pages to scrape.
 2. Web scraping component extracts text content from these pages, which is then used to train and fine-tune the chatbot's language models.
-3.[Weaviate](https://weaviate.io/) or [Qdrant](https://qdrant.tech/) databases can be used as the vector database.
+3. [Weaviate](https://weaviate.io/) or [Qdrant](https://qdrant.tech/) databases can be used as the vector database.
 4. A script is deployed on `AWS Lambda` to daily scrape dynamic content and update the database
 
 ## Getting Started
